@@ -1,0 +1,7 @@
+{
+  "name": "RestoPilot AI",
+  "description": "AI Co-Pilot and CFO for small restaurants. Manages inventory, recipes, costs, and waste conversationally.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
