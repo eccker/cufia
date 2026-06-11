@@ -2,15 +2,14 @@ import React, { useState } from 'react';
 import { ChatArea } from './components/ChatArea';
 import { Dashboard } from './components/Dashboard';
 import { InventoryView } from './components/InventoryView';
-import { Login } from './components/Login';
-import { MessageSquare, LayoutDashboard, PackageSearch, LogOut, User } from 'lucide-react';
-import { useAuth } from './context/AuthContext';
+import { MessageSquare, LayoutDashboard, PackageSearch, Download, Database } from 'lucide-react';
+import { useAppContext } from './context/AppContext';
 
 type ViewState = 'chat' | 'dashboard' | 'inventory';
 
-const AppContent: React.FC = () => {
-  const { user, logout } = useAuth();
+const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>('chat');
+  const { exportData } = useAppContext();
 
   return (
     <div className="flex h-screen w-full bg-gray-100 font-sans">
@@ -52,36 +51,31 @@ const AppContent: React.FC = () => {
         </div>
 
         <div className="p-4 border-t border-gray-100">
-          <div className="flex items-center mb-4 px-2">
-            <User className="w-5 h-5 text-gray-500 mr-2" />
-            <div className="hidden md:block overflow-hidden">
-              <p className="text-sm font-medium text-gray-800 truncate">{user?.restaurantName}</p>
-              <p className="text-xs text-gray-500 truncate">{user?.email}</p>
-            </div>
-          </div>
           <button 
-            onClick={logout}
-            className="w-full flex items-center justify-center md:justify-start p-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            onClick={exportData}
+            className="w-full flex items-center justify-center md:justify-start p-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+            title="Exportar a JSON (Compatible con Sheets)"
           >
-            <LogOut className="w-5 h-5 md:mr-2" />
-            <span className="hidden md:block">Cerrar Sesión</span>
+            <Download className="w-5 h-5 md:mr-2" />
+            <span className="hidden md:block">Exportar Datos</span>
           </button>
+          
+          {/* MCP Connection Stub Indicator */}
+          <div className="mt-4 flex items-center justify-center md:justify-start p-2 text-xs text-green-600 bg-green-50 rounded-lg">
+            <Database className="w-4 h-4 md:mr-2" />
+            <span className="hidden md:block">MongoDB MCP Activo</span>
+          </div>
         </div>
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden relative">
+      <div className="flex-1 flex flex-col overflow-hidden">
         {currentView === 'chat' && <ChatArea />}
         {currentView === 'dashboard' && <Dashboard />}
         {currentView === 'inventory' && <InventoryView />}
       </div>
     </div>
   );
-};
-
-const App: React.FC = () => {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <AppContent /> : <Login />;
 };
 
 export default App;
