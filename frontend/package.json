@@ -1,5 +1,5 @@
 {
-  "name": "restopilot-ai-frontend",
+  "name": "cufia-frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,8 +11,10 @@
   "dependencies": {
     "react": "latest",
     "react-dom": "latest",
+    "@google/genai": "latest",
     "lucide-react": "latest",
-    "recharts": "latest"
+    "recharts": "latest",
+    "date-fns": "latest"
   },
   "devDependencies": {
     "@types/node": "latest",
