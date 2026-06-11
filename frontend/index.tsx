@@ -2,7 +2,6 @@ import './vertex-ai-proxy-interceptor.js';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
-import { AuthProvider } from './context/AuthContext.tsx';
 import { AppProvider } from './context/AppContext.tsx';
 
 const rootElement = document.getElementById('root');
@@ -13,10 +12,8 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <AuthProvider>
-      <AppProvider>
-        <App />
-      </AppProvider>
-    </AuthProvider>
+    <AppProvider>
+      <App />
+    </AppProvider>
   </React.StrictMode>
 );
