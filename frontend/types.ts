@@ -41,33 +41,18 @@ export interface ChatMessage {
   imageUrl?: string;
 }
 
-export interface AppSettings {
-  backendUrl: string;
-  mongoUri: string;
-  mongoDatabase: string;
-  loyverseToken: string;
-}
-
 export interface AppState {
   inventory: Ingredient[];
   recipes: Recipe[];
   transactions: Transaction[];
   messages: ChatMessage[];
-  isLoading: boolean;
 }
 
 export interface AppContextType extends AppState {
   addMessage: (msg: Omit<ChatMessage, 'id' | 'timestamp'>) => void;
-  updateInventory: (items: { name: string; quantity: number; unit: string; totalCost: number }[]) => Promise<void>;
-  addRecipe: (recipe: Omit<Recipe, 'id'>) => Promise<void>;
-  logWaste: (itemName: string, quantity: number, unit: string, reason: string) => Promise<void>;
-  recordSale: (recipeName: string, quantity: number, totalRevenue: number) => Promise<void>;
-  syncLoyverse: () => Promise<string>;
+  updateInventory: (items: { name: string; quantity: number; unit: string; totalCost: number }[]) => void;
+  addRecipe: (recipe: Omit<Recipe, 'id'>) => void;
+  logWaste: (itemName: string, quantity: number, unit: string, reason: string) => void;
+  recordSale: (recipeName: string, quantity: number, totalRevenue: number) => void;
   exportData: () => void;
-}
-
-export interface SettingsContextType {
-  settings: AppSettings;
-  updateSettings: (newSettings: Partial<AppSettings>) => void;
-  isConfigured: boolean;
 }
