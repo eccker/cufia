@@ -4,7 +4,7 @@ import { useAppContext } from '../context/AppContext';
 import { SYSTEM_INSTRUCTION, TOOLS } from '../constants';
 
 export const useAgent = () => {
-  const { addMessage, updateInventory, addRecipe, logWaste, recordSale, syncLoyverse, inventory } = useAppContext();
+  const { addMessage, updateInventory, addRecipe, logWaste, recordSale, inventory } = useAppContext();
   const [isTyping, setIsTyping] = useState(false);
   const chatRef = useRef<Chat | null>(null);
 
@@ -22,7 +22,7 @@ export const useAgent = () => {
           config: {
             systemInstruction: SYSTEM_INSTRUCTION,
             tools: [{ functionDeclarations: TOOLS }],
-            temperature: 0.2,
+            temperature: 0.2, // Lower temperature for more deterministic tool calling
           }
         });
       } catch (error) {
@@ -41,7 +41,8 @@ export const useAgent = () => {
     try {
       let response;
       
-      const contextStr = `\n[Contexto del Sistema: Inventario actual tiene ${inventory.length} items en MongoDB.]`;
+      // Prepare context string to help the model make better decisions
+      const contextStr = `\n[Contexto del Sistema: Inventario actual tiene ${inventory.length} items.]`;
       const messageText = text + contextStr;
 
       if (base64Image && mimeType) {
@@ -64,19 +65,16 @@ export const useAgent = () => {
           try {
             switch (call.name) {
               case 'update_inventory':
-                await updateInventory(call.args.items as any);
+                updateInventory(call.args.items as any);
                 break;
               case 'add_recipe':
-                await addRecipe(call.args as any);
+                addRecipe(call.args as any);
                 break;
               case 'log_waste':
-                await logWaste(call.args.itemName as string, call.args.quantity as number, call.args.unit as string, call.args.reason as string);
+                logWaste(call.args.itemName as string, call.args.quantity as number, call.args.unit as string, call.args.reason as string);
                 break;
               case 'record_sale':
-                await recordSale(call.args.recipeName as string, call.args.quantity as number, call.args.totalRevenue as number);
-                break;
-              case 'sync_loyverse_sales':
-                result = await syncLoyverse();
+                recordSale(call.args.recipeName as string, call.args.quantity as number, call.args.totalRevenue as number);
                 break;
               default:
                 result = "Unknown function";
@@ -108,7 +106,7 @@ export const useAgent = () => {
     } finally {
       setIsTyping(false);
     }
-  }, [addMessage, updateInventory, addRecipe, logWaste, recordSale, syncLoyverse, inventory.length]);
+  }, [addMessage, updateInventory, addRecipe, logWaste, recordSale, inventory.length]);
 
   return { sendMessage, isTyping };
 };
