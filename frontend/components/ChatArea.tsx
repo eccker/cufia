@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Paperclip, Loader2 } from 'lucide-react';
+import { Send, Paperclip, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
+import { useAgent } from '../hooks/useAgent';
 
 export const ChatArea: React.FC = () => {
-  const { messages, sendMessage, isLoading } = useAppContext();
+  const { messages, addMessage } = useAppContext();
+  const { sendMessage, isTyping } = useAgent();
   const [inputText, setInputText] = useState('');
   const [selectedImage, setSelectedImage] = useState<{ data: string, mimeType: string, preview: string } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -15,13 +17,20 @@ export const ChatArea: React.FC = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isLoading]);
+  }, [messages, isTyping]);
 
   const handleSend = async () => {
     if (!inputText.trim() && !selectedImage) return;
 
     const textToSend = inputText;
     const imageToSend = selectedImage;
+
+    // Optimistic UI update
+    addMessage({
+      role: 'user',
+      text: textToSend,
+      imageUrl: imageToSend?.preview
+    });
 
     setInputText('');
     setSelectedImage(null);
@@ -47,6 +56,7 @@ export const ChatArea: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full bg-[#e5ddd5] relative">
+      {/* Chat Header */}
       <div className="bg-[#075e54] text-white p-4 flex items-center shadow-md z-10">
         <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-[#075e54] font-bold text-xl mr-3">
           RP
@@ -57,6 +67,7 @@ export const ChatArea: React.FC = () => {
         </div>
       </div>
 
+      {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/cubes.png")' }}>
         {messages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -73,7 +84,7 @@ export const ChatArea: React.FC = () => {
             </div>
           </div>
         ))}
-        {isLoading && (
+        {isTyping && (
           <div className="flex justify-start">
             <div className="bg-white rounded-lg rounded-tl-none p-3 shadow-sm flex items-center space-x-2">
               <Loader2 className="w-4 h-4 animate-spin text-gray-500" />
@@ -84,6 +95,7 @@ export const ChatArea: React.FC = () => {
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Image Preview Overlay */}
       {selectedImage && (
         <div className="absolute bottom-20 left-4 bg-white p-2 rounded-lg shadow-lg border border-gray-200 flex items-start space-x-2">
           <img src={selectedImage.preview} alt="Preview" className="w-16 h-16 object-cover rounded" />
@@ -91,6 +103,7 @@ export const ChatArea: React.FC = () => {
         </div>
       )}
 
+      {/* Input Area */}
       <div className="bg-[#f0f0f0] p-3 flex items-center space-x-2">
         <button 
           onClick={() => fileInputRef.current?.click()}
@@ -115,9 +128,9 @@ export const ChatArea: React.FC = () => {
         />
         <button 
           onClick={handleSend}
-          disabled={(!inputText.trim() && !selectedImage) || isLoading}
+          disabled={!inputText.trim() && !selectedImage || isTyping}
           className={`p-3 rounded-full flex items-center justify-center transition-colors ${
-            (!inputText.trim() && !selectedImage) || isLoading ? 'bg-gray-300 text-gray-500' : 'bg-[#075e54] text-white hover:bg-[#128c7e]'
+            (!inputText.trim() && !selectedImage) || isTyping ? 'bg-gray-300 text-gray-500' : 'bg-[#075e54] text-white hover:bg-[#128c7e]'
           }`}
         >
           <Send className="w-5 h-5 ml-1" />
